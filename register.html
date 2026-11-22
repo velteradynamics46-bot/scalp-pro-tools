@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Akun - Scap pro Tools PAC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body {
+            background-color: #0d0d0d; display: flex; justify-content: center;
+            align-items: center; min-height: 100vh; color: #ffffff; padding: 20px 0;
+        }
+        .login-card {
+            background-color: #1a1a1a; width: 100%; max-width: 400px;
+            padding: 40px 30px; border-radius: 12px; border: 1px solid #2a2a2a;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+        .title-brand { font-size: 24px; font-weight: 700; color: #00bfa5; margin-bottom: 4px; }
+        .subtitle { font-size: 14px; color: #888888; margin-bottom: 25px; }
+        .form-group { margin-bottom: 16px; text-align: left; }
+        .form-group label { display: block; font-size: 12px; color: #aaaaaa; margin-bottom: 6px; }
+        .form-group input {
+            width: 100%; padding: 12px 16px; font-size: 14px; background-color: #edf2f7;
+            border: 1px solid #ccc; border-radius: 6px; color: #333333; outline: none; transition: all 0.3s ease;
+        }
+        .form-group input:focus { border-color: #00bfa5; box-shadow: 0 0 5px rgba(0, 191, 165, 0.3); }
+        .btn-login {
+            width: 100%; background-color: #00bfa5; color: #0c0d0d; border: none;
+            padding: 12px; font-size: 15px; font-weight: 600; border-radius: 6px;
+            cursor: pointer; margin-top: 10px; transition: background-color 0.2s ease;
+        }
+        .btn-login:hover { background-color: #009688; }
+        .footer-text { text-align: center; font-size: 12px; color: #888888; margin-top: 25px; }
+        .footer-text a { color: #00bfa5; text-decoration: none; font-weight: 600; }
+        .footer-text a:hover { text-decoration: underline; }
+        .alert-error {
+            background-color: rgba(255, 82, 82, 0.15); color: #ff5252;
+            padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 15px;
+            display: none; border: 1px solid #ff5252;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <h1 class="title-brand">Scap pro Tools PAC</h1>
+        <p class="subtitle">Daftar Akun Baru</p>
+
+        <div id="error-msg" class="alert-error"></div>
+
+        <form id="register-form">
+            <div class="form-group">
+                <label for="nama">Nama Lengkap</label>
+                <input type="text" id="nama" placeholder="Masukkan nama lengkap Anda" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Masukkan email Anda" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Buat password baru" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm-password">Konfirmasi Password</label>
+                <input type="password" id="confirm-password" placeholder="Ulangi password Anda" required>
+            </div>
+
+            <button type="submit" class="btn-login">Daftar Sekarang</button>
+        </form>
+
+        <p class="footer-text">Sudah punya akun? <a href="index.html">Login di sini</a></p>
+    </div>
+
+    <script>
+        document.getElementById('register-form').addEventListener('submit', function(e) {
+            e.preventDefault(); // Mencegah halaman reload kosong
+
+            const nama = document.getElementById('nama').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const errorMsg = document.getElementById('error-msg');
+
+            // Cek apakah password dan konfirmasi password sama
+            if (password !== confirmPassword) {
+                errorMsg.style.display = 'block';
+                errorMsg.innerText = 'Password dan Konfirmasi Password tidak cocok!';
+                return;
+            }
+
+            // Simpan data akun ke penyimpanan browser (localStorage)
+            const dataUser = { nama: nama, email: email, password: password };
+            localStorage.setItem('akunTerdaftar', JSON.stringify(dataUser));
+
+            alert('Pendaftaran berhasil! Silakan login menggunakan akun Anda.');
+            window.location.href = 'index.html'; // Pindah ke halaman Login
+        });
+    </script>
+
+</body>
+</html>

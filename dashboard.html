@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Scap pro Tools PAC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: #0d0d0d; color: #ffffff; min-height: 100vh; padding: 30px 20px; }
+        .container { max-width: 720px; margin: 0 auto; }
+
+        .header {
+            display: flex; justify-content: space-between; align-items: center; gap: 15px;
+            background-color: #1a1a1a; padding: 20px 25px; border-radius: 12px;
+            border: 1px solid #2a2a2a; margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .header h1 { font-size: 20px; color: #00bfa5; }
+        .header p { font-size: 13px; color: #888888; margin-top: 4px; }
+
+        .btn-logout {
+            background-color: transparent; color: #ff5252; border: 1px solid #ff5252;
+            padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600;
+            cursor: pointer; transition: 0.2s;
+        }
+        .btn-logout:hover { background-color: rgba(255, 82, 82, 0.1); }
+
+        .card {
+            background-color: #1a1a1a; padding: 25px; border-radius: 12px;
+            border: 1px solid #2a2a2a; margin-bottom: 20px;
+        }
+        .card h2 { font-size: 16px; margin-bottom: 10px; color: #ffffff; }
+        .card p.desc { font-size: 13px; color: #999999; margin-bottom: 16px; }
+
+        .btn-primary {
+            background-color: #00bfa5; color: #0c0d0d; border: none;
+            padding: 11px 16px; border-radius: 6px; font-size: 13px; font-weight: 600;
+            cursor: pointer; transition: 0.2s; text-decoration: none; display: inline-block;
+        }
+        .btn-primary:hover { background-color: #009688; }
+
+        .btn-outline {
+            background-color: transparent; color: #00bfa5; border: 1px solid #00bfa5;
+            padding: 11px 18px; border-radius: 6px; font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: 0.2s; text-decoration: none; display: inline-block;
+        }
+        .btn-outline:hover { background-color: rgba(0, 191, 165, 0.1); }
+
+        .slots-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 14px;
+        }
+        .account-slot {
+            background-color: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 10px;
+            padding: 16px;
+        }
+        .slot-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px; gap: 8px;
+        }
+        .slot-title { font-size: 14px; font-weight: 600; color: #ffffff; }
+        .slot-badge {
+            font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px;
+        }
+        .slot-badge.is-active {
+            background-color: rgba(0, 200, 150, 0.15); color: #00c896;
+            border: 1px solid #00c896;
+        }
+        .slot-badge.is-empty {
+            background-color: rgba(156, 163, 175, 0.12); color: #9ca3af;
+            border: 1px solid #374151;
+        }
+
+        .slot-input {
+            width: 100%; padding: 10px 12px; font-size: 14px;
+            background-color: #edf2f7; border: 1px solid #ccc; border-radius: 6px;
+            color: #333333; outline: none; margin-bottom: 10px;
+        }
+        .slot-input:focus { border-color: #00bfa5; }
+
+        .slot-actions {
+            display: flex; gap: 8px; align-items: center;
+        }
+        .btn-remove {
+            background-color: transparent; color: #ff5252; border: 1px solid #ff5252;
+            padding: 10px 12px; border-radius: 6px; font-size: 13px; font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-remove:hover { background-color: rgba(255, 82, 82, 0.12); }
+
+        .slot-note {
+            margin-top: 10px; font-size: 12px; color: #9ca3af; line-height: 1.45;
+        }
+        .status-text {
+            margin-top: 14px; font-size: 13px; color: #9ca3af;
+        }
+        .action-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1>Scap pro Tools PAC</h1>
+                <p id="welcome-text">Selamat datang, Trader!</p>
+            </div>
+            <button class="btn-logout" onclick="logout()">Keluar</button>
+        </div>
+
+        <!-- Kartu Nomor Akun Trading Terpisah (Slot 1 & Slot 2) -->
+        <div class="card">
+            <h2>Nomor Akun Trading (MT4 / MT5) — Maks. 2 Akun</h2>
+            <p class="desc">Cukup masukkan nomor akun trading Anda (5–12 digit angka) pada kolom Akun #1 dan/atau Akun #2 agar aktif dan siap digunakan trading.</p>
+
+            <div class="slots-grid">
+                <!-- Kolom Akun #1 -->
+                <div class="account-slot">
+                    <div class="slot-header">
+                        <span class="slot-title">Akun Trading #1</span>
+                        <span class="slot-badge is-empty" id="badge-akun-1">Belum Diisi</span>
+                    </div>
+                    <input
+                        type="text"
+                        id="mt-account-1"
+                        class="slot-input"
+                        placeholder="No. Akun #1 (contoh: 10293847)"
+                    >
+                    <div class="slot-actions">
+                        <button type="button" class="btn-primary" id="btn-simpan-1" onclick="simpanSlotAkun(0)">
+                            Aktifkan Akun #1
+                        </button>
+                        <button type="button" class="btn-remove" id="btn-hapus-1" onclick="hapusSlotAkun(0)">
+                            Hapus
+                        </button>
+                    </div>
+                    <p class="slot-note" id="info-akun-1">Masukkan nomor akun #1 lalu klik Aktifkan Akun #1.</p>
+                </div>
+
+                <!-- Kolom Akun #2 -->
+                <div class="account-slot">
+                    <div class="slot-header">
+                        <span class="slot-title">Akun Trading #2</span>
+                        <span class="slot-badge is-empty" id="badge-akun-2">Belum Diisi</span>
+                    </div>
+                    <input
+                        type="text"
+                        id="mt-account-2"
+                        class="slot-input"
+                        placeholder="No. Akun #2 (contoh: 56473829)"
+                    >
+                    <div class="slot-actions">
+                        <button type="button" class="btn-primary" id="btn-simpan-2" onclick="simpanSlotAkun(1)">
+                            Aktifkan Akun #2
+                        </button>
+                        <button type="button" class="btn-remove" id="btn-hapus-2" onclick="hapusSlotAkun(1)">
+                            Hapus
+                        </button>
+                    </div>
+                    <p class="slot-note" id="info-akun-2">Masukkan nomor akun #2 lalu klik Aktifkan Akun #2.</p>
+                </div>
+            </div>
+
+            <p class="status-text" id="mt-status-text">Akun aktif untuk trading: Belum ada (0 / 2 akun aktif).</p>
+        </div>
+
+        <!-- Kartu File & Panduan -->
+        <div class="card">
+            <h2>File EA & Panduan Instalasi</h2>
+            <p class="desc">Pilih dan unduh file yang tersedia di bawah ini.</p>
+            <p id="tools-access-info" style="margin-bottom: 14px; font-size: 13px; color: #fbbf24;">
+                Status Tools: Aktifkan minimal 1 nomor akun trading (maks. 2 akun) untuk membuka akses tools.
+            </p>
+
+            <div class="action-row">
+                <a href="https://l1nk.dev/22klqwl" id="link-file-1" class="btn-primary" target="_blank" rel="noopener noreferrer">Download FDA</a>
+                <a href="https://l1nk.dev/fpou312" id="link-file-2" class="btn-outline" target="_blank" rel="noopener noreferrer">Download BASE DBD RBR</a>
+                <a href="https://acesse.one/n84n6l8" id="link-file-3" class="btn-outline" target="_blank" rel="noopener noreferrer">Download EA Scap Tools</a>
+                <button type="button" class="btn-outline" onclick="downloadPanduan()">Unduh Panduan (PAC-TOOLS)</button>
+                <a href="index.html" class="btn-outline">Kembali ke Login</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const JUMLAH_SLOT = 2;
+        const TOOLS_AKTIF = ['FDA', 'BASE DBD & RBR', 'SCALP TOOLS'];
+
+        const userAktif = JSON.parse(localStorage.getItem('userLogin'));
+        if (!userAktif) {
+            window.location.href = 'index.html';
+        } else {
+            document.getElementById('welcome-text').innerText =
+                'Halo, ' + userAktif.nama + ' (' + userAktif.email + ')';
+        }
+
+        function getStorageKeySlot() {
+            const emailKey = (userAktif && userAktif.email) ? userAktif.email : 'default';
+            return 'mt_slot_akun_' + emailKey;
+        }
+
+        function ambilSlotAkun() {
+            try {
+                const raw = JSON.parse(localStorage.getItem(getStorageKeySlot()) || '["",""]');
+                if (!Array.isArray(raw)) return ['', ''];
+                return [0, 1].map((idx) => {
+                    const val = String(raw[idx] || '').trim();
+                    return /^\d{5,12}$/.test(val) ? val : '';
+                });
+            } catch (err) {
+                return ['', ''];
+            }
+        }
+
+        function simpanSlotArray(slots) {
+            const bersih = [0, 1].map((idx) => {
+                const val = String(slots[idx] || '').trim();
+                return /^\d{5,12}$/.test(val) ? val : '';
+            });
+            localStorage.setItem(getStorageKeySlot(), JSON.stringify(bersih));
+        }
+
+        function sinkronStatusTools(akunAktifList) {
+            const infoEl = document.getElementById('tools-access-info');
+            const toolLinks = [
+                document.getElementById('link-file-1'),
+                document.getElementById('link-file-2'),
+                document.getElementById('link-file-3')
+            ];
+
+            const adaAkunAktif = akunAktifList.length > 0;
+
+            if (infoEl) {
+                if (adaAkunAktif) {
+                    infoEl.style.color = '#00c896';
+                    infoEl.innerText =
+                        'Status Tools: AKTIF untuk Akun Trading ' + akunAktifList.join(' & ') +
+                        ' (' + TOOLS_AKTIF.join(', ') + ' terbuka)';
+                } else {
+                    infoEl.style.color = '#fbbf24';
+                    infoEl.innerText =
+                        'Status Tools: Aktifkan minimal 1 nomor akun trading (maks. 2 akun) untuk membuka akses tools.';
+                }
+            }
+
+            toolLinks.forEach((linkEl) => {
+                if (!linkEl) return;
+                if (!linkEl.dataset.originalHref) {
+                    linkEl.dataset.originalHref = linkEl.getAttribute('href') || '#';
+                }
+
+                if (adaAkunAktif) {
+                    linkEl.setAttribute('href', linkEl.dataset.originalHref);
+                    linkEl.style.opacity = '1';
+                    linkEl.onclick = null;
+                } else {
+                    linkEl.style.opacity = '0.55';
+                    linkEl.onclick = function (e) {
+                        e.preventDefault();
+                        const input1 = document.getElementById('mt-account-1');
+                        if (input1) {
+                            input1.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            input1.focus();
+                        }
+                    };
+                }
+            });
+        }
+
+        function renderSemuaSlot(pesanRingkasan, warnaRingkasan) {
+            const slots = ambilSlotAkun();
+            const akunAktifList = [];
+
+            for (let i = 0; i < JUMLAH_SLOT; i++) {
+                const no = i + 1;
+                const val = slots[i];
+                const inputEl = document.getElementById('mt-account-' + no);
+                const badgeEl = document.getElementById('badge-akun-' + no);
+                const infoEl = document.getElementById('info-akun-' + no);
+                const btnHapus = document.getElementById('btn-hapus-' + no);
+
+                if (inputEl) {
+                    inputEl.value = val;
+                }
+
+                if (val) {
+                    akunAktifList.push('#' + no + ' (' + val + ')');
+                    if (badgeEl) {
+                        badgeEl.className = 'slot-badge is-active';
+                        badgeEl.innerText = 'Aktif';
+                    }
+                    if (infoEl) {
+                        infoEl.style.color = '#00c896';
+                        infoEl.innerText = 'Akun ' + val + ' aktif dan siap digunakan untuk trading.';
+                    }
+                    if (btnHapus) {
+                        btnHapus.style.display = 'inline-block';
+                    }
+                } else {
+                    if (badgeEl) {
+                        badgeEl.className = 'slot-badge is-empty';
+                        badgeEl.innerText = 'Belum Diisi';
+                    }
+                    if (infoEl) {
+                        infoEl.style.color = '#9ca3af';
+                        infoEl.innerText = 'Masukkan nomor akun #' + no + ' (5–12 digit) lalu aktifkan.';
+                    }
+                    if (btnHapus) {
+                        btnHapus.style.display = 'none';
+                    }
+                }
+            }
+
+            const statusEl = document.getElementById('mt-status-text');
+            if (statusEl) {
+                const jumlahAktif = akunAktifList.length;
+                const daftarTeks = jumlahAktif > 0 ? akunAktifList.join(', ') : 'Belum ada';
+                const dasar = 'Akun aktif untuk trading: ' + daftarTeks + ' (' + jumlahAktif + ' / ' + JUMLAH_SLOT + ' akun aktif).';
+                if (pesanRingkasan) {
+                    statusEl.style.color = warnaRingkasan || '#00bfa5';
+                    statusEl.innerText = pesanRingkasan + ' — ' + dasar;
+                } else {
+                    statusEl.style.color = jumlahAktif > 0 ? '#00c896' : '#9ca3af';
+                    statusEl.innerText = dasar;
+                }
+            }
+
+            sinkronStatusTools(akunAktifList);
+        }
+
+        function simpanSlotAkun(slotIndex) {
+            const no = slotIndex + 1;
+            const inputEl = document.getElementById('mt-account-' + no);
+            const infoEl = document.getElementById('info-akun-' + no);
+            if (!inputEl) return;
+
+            const nomorBaru = inputEl.value.trim();
+            if (!/^\d{5,12}$/.test(nomorBaru)) {
+                if (infoEl) {
+                    infoEl.style.color = '#f87171';
+                    infoEl.innerText = 'Format tidak valid. Masukkan 5–12 digit angka.';
+                }
+                renderSemuaSlot('Format nomor Akun #' + no + ' harus 5–12 digit angka.', '#f87171');
+                return;
+            }
+
+            const slots = ambilSlotAkun();
+            const slotLainIndex = slotIndex === 0 ? 1 : 0;
+            if (slots[slotLainIndex] && slots[slotLainIndex] === nomorBaru) {
+                if (infoEl) {
+                    infoEl.style.color = '#fbbf24';
+                    infoEl.innerText = 'Nomor akun ini sudah aktif di Akun #' + (slotLainIndex + 1) + '.';
+                }
+                renderSemuaSlot('Nomor akun ' + nomorBaru + ' sudah terdaftar di slot lain.', '#fbbf24');
+                return;
+            }
+
+            slots[slotIndex] = nomorBaru;
+            simpanSlotArray(slots);
+            renderSemuaSlot('Akun #' + no + ' (' + nomorBaru + ') berhasil diaktifkan.', '#00c896');
+        }
+
+        function hapusSlotAkun(slotIndex) {
+            const no = slotIndex + 1;
+            const slots = ambilSlotAkun();
+            const terhapus = slots[slotIndex];
+            if (!terhapus) return;
+
+            slots[slotIndex] = '';
+            simpanSlotArray(slots);
+            renderSemuaSlot('Akun #' + no + ' (' + terhapus + ') dihapus.', '#9ca3af');
+        }
+
+        function downloadPanduan() {
+            const slots = ambilSlotAkun();
+            const detailSlot = [0, 1].map((idx) =>
+                'Akun #' + (idx + 1) + ' : ' + (slots[idx] ? slots[idx] + ' (Aktif)' : 'Kosong')
+            ).join('\n');
+
+            const isiPanduan =
+                "PANDUAN INSTALASI - SCAP PRO TOOLS PAC\n" +
+                "=====================================\n" +
+                detailSlot + "\n\n" +
+                "1. Salin file EA ke folder MQL4/Experts atau MQL5/Experts.\n" +
+                "2. Refresh Navigator di MetaTrader lalu tarik EA ke chart.\n" +
+                "3. Aktifkan AutoTrading / Algo Trading di terminal MetaTrader.\n";
+
+            const blob = new Blob([isiPanduan], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Panduan-Scap-Pro-Tools-PAC.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function logout() {
+            localStorage.removeItem('userLogin');
+            window.location.href = 'index.html';
+        }
+
+        renderSemuaSlot();
+    </script>
+</body>
+</html>

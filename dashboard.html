@@ -38,6 +38,7 @@
             cursor: pointer; transition: 0.2s; text-decoration: none; display: inline-block;
         }
         .btn-primary:hover { background-color: #009688; }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .btn-outline {
             background-color: transparent; color: #00bfa5; border: 1px solid #00bfa5;
@@ -45,6 +46,24 @@
             cursor: pointer; transition: 0.2s; text-decoration: none; display: inline-block;
         }
         .btn-outline:hover { background-color: rgba(0, 191, 165, 0.1); }
+
+        .license-box {
+            border-radius: 8px; padding: 14px 16px; font-size: 13px; line-height: 1.55;
+            margin-bottom: 14px;
+        }
+        .license-box.belum {
+            background-color: rgba(251, 191, 36, 0.10); border: 1px solid #fbbf24; color: #fbbf24;
+        }
+        .license-box.sudah {
+            background-color: rgba(0, 200, 150, 0.10); border: 1px solid #00c896; color: #00c896;
+        }
+        .license-box strong { color: #ffffff; }
+        .license-box .no-lisensi {
+            font-size: 18px; font-weight: 700; letter-spacing: 1px; color: #00bfa5;
+            background: #121212; border: 1px dashed #00bfa5; border-radius: 6px;
+            padding: 8px 12px; display: inline-block; margin: 6px 0;
+        }
+        .bukti-thumb { max-width: 100%; max-height: 130px; border-radius: 6px; margin-top: 8px; object-fit: contain; }
 
         .slots-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -77,6 +96,7 @@
             color: #333333; outline: none; margin-bottom: 10px;
         }
         .slot-input:focus { border-color: #00bfa5; }
+        .slot-input:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .slot-actions {
             display: flex; gap: 8px; align-items: center;
@@ -95,6 +115,37 @@
             margin-top: 14px; font-size: 13px; color: #9ca3af;
         }
         .action-row { display: flex; gap: 12px; flex-wrap: wrap; }
+
+        .download-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 10px;
+        }
+        .dl-item {
+            display: block; text-align: center; padding: 12px 10px; border-radius: 8px;
+            border: 1px solid #00bfa5; color: #00bfa5; text-decoration: none;
+            font-size: 13px; font-weight: 600; transition: 0.2s; background: transparent;
+        }
+        .dl-item:hover { background-color: rgba(0, 191, 165, 0.1); }
+        .dl-item small { display: block; font-weight: 400; color: #9ca3af; margin-top: 3px; font-size: 11px; }
+        .dl-item.utama { background-color: #00bfa5; color: #0c0d0d; }
+        .dl-item.utama small { color: #10331f; }
+        .dl-item.utama:hover { background-color: #009688; }
+        .dl-locked { opacity: 0.5; }
+
+        .visual-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 14px;
+        }
+        .visual-grid figure {
+            background-color: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 10px;
+            padding: 12px; margin: 0;
+        }
+        .visual-grid img {
+            width: 100%; height: auto; background: #ffffff; border-radius: 6px; display: block;
+        }
+        .visual-grid figcaption {
+            font-size: 12px; color: #9ca3af; margin-top: 8px; text-align: center; line-height: 1.4;
+        }
     </style>
 </head>
 <body>
@@ -109,10 +160,19 @@
             <button class="btn-logout" onclick="logout()">Keluar</button>
         </div>
 
-        <!-- Kartu Nomor Akun Trading Terpisah (Slot 1 & Slot 2) -->
-        <div class="card">
+        <!-- Kartu Lisensi & Pembelian (GERBANG UTAMA) -->
+        <div class="card" id="card-lisensi">
+            <h2>Status Lisensi & Pembelian</h2>
+            <div id="license-box" class="license-box belum"></div>
+            <div class="action-row">
+                <a href="Checkout.html" id="btn-checkout" class="btn-primary">Beli Lisensi — Checkout & Upload Bukti Transfer</a>
+            </div>
+        </div>
+
+        <!-- Kartu Nomor Akun Trading (Slot 1 & Slot 2) -->
+        <div class="card" id="card-slot">
             <h2>Nomor Akun Trading (MT4 / MT5) — Maks. 2 Akun</h2>
-            <p class="desc">Cukup masukkan nomor akun trading Anda (5–12 digit angka) pada kolom Akun #1 dan/atau Akun #2 agar aktif dan siap digunakan trading.</p>
+            <p class="desc">Setelah pembelian tercatat, masukkan nomor akun trading Anda (5–12 digit angka) pada kolom Akun #1 dan/atau Akun #2 agar aktif dan siap digunakan trading.</p>
 
             <div class="slots-grid">
                 <!-- Kolom Akun #1 -->
@@ -166,37 +226,125 @@
         </div>
 
         <!-- Kartu File & Panduan -->
-        <div class="card">
-            <h2>File EA & Panduan Instalasi</h2>
-            <p class="desc">Pilih dan unduh file yang tersedia di bawah ini.</p>
+        <div class="card" id="card-download">
+            <h2>File EA & Buku Panduan</h2>
+            <p class="desc">Unduh paket EA v4.01 beserta buku panduan lengkap. Akses terbuka setelah pembelian tercatat dan minimal 1 slot akun aktif (maks. 2).</p>
             <p id="tools-access-info" style="margin-bottom: 14px; font-size: 13px; color: #fbbf24;">
-                Status Tools: Aktifkan minimal 1 nomor akun trading (maks. 2 akun) untuk membuka akses tools.
+                Status Tools: terkunci — selesaikan pembelian dan aktifkan nomor akun trading.
             </p>
 
-            <div class="action-row">
-                <a href="https://l1nk.dev/22klqwl" id="link-file-1" class="btn-primary" target="_blank" rel="noopener noreferrer">Download FDA</a>
-                <a href="https://l1nk.dev/fpou312" id="link-file-2" class="btn-outline" target="_blank" rel="noopener noreferrer">Download BASE DBD RBR</a>
-                <a href="https://acesse.one/n84n6l8" id="link-file-3" class="btn-outline" target="_blank" rel="noopener noreferrer">Download EA Scap Tools</a>
-                <button type="button" class="btn-outline" onclick="downloadPanduan()">Unduh Panduan (PAC-TOOLS)</button>
-                <a href="index.html" class="btn-outline">Kembali ke Login</a>
+            <div class="download-grid">
+                <a href="downloads/Paket_Lengkap_v4.01.zip" id="link-paket" class="dl-item utama" download>Download Paket Lengkap (ZIP)<small>EA + indikator + panduan + 5 setting .set</small></a>
+                <a href="downloads/SCALP_TOOLS_v4.01.ex5" id="link-file-3" class="dl-item" download>EA SCALP TOOLS v4.01<small>panel dashboard (Experts)</small></a>
+                <a href="downloads/FDA_Base_v1.71.ex5" id="link-file-1" class="dl-item" download>Indikator FDA Base v1.71<small>zona Grade A+ (Indicators)</small></a>
+                <a href="downloads/Zone_DBD_RBR_v2.03.ex5" id="link-file-2" class="dl-item" download>Indikator Zone DBD RBR v2.03<small>zona PAC (Indicators)</small></a>
+                <a href="downloads/MATERI_RULES_DAN_PARAMETER_v4.01.pdf" id="link-pdf" class="dl-item" download>Buku Panduan Lengkap (PDF)<small>rules + parameter + diagram</small></a>
+                <a href="downloads/MATERI_KETAHANAN.docx" id="link-docx" class="dl-item" download>Materi Ketahanan (Word)<small>tabel balance & lot 5 tier</small></a>
+                <a href="downloads/HITUNGAN_BALANCE_LOT_KETAHANAN.csv" id="link-csv" class="dl-item" download>Tabel Hitungan Lot (CSV)<small>buka di Excel</small></a>
+                <a href="downloads/RENCANA_FORWARD_TEST.txt" id="link-rencana" class="dl-item" download>Rencana Forward Test<small>protokol uji demo</small></a>
+            </div>
+        </div>
+
+        <!-- Kartu Diagram Rules EA -->
+        <div class="card" id="card-visual">
+            <h2>Panduan Visual — Rules EA Keseluruhan</h2>
+            <p class="desc">Diagram alur sistem, struktur harga PAC, siklus trading, serta rules kualitas zona & proteksi modal. Gambar vektor (tajam di zoom berapa pun).</p>
+            <div class="visual-grid">
+                <figure>
+                    <img src="assets/rules-1-arsitektur.svg" alt="Diagram arsitektur tiga program">
+                    <figcaption>Gambar 1 — Arsitektur: 2 indikator + EA panel + broker</figcaption>
+                </figure>
+                <figure>
+                    <img src="assets/rules-2-struktur-pac.svg" alt="Diagram struktur harga PAC">
+                    <figcaption>Gambar 2 — Struktur PAC: Area ¼ TA, TP tengah, CL 20%, SL 1:1, layer L1–L5</figcaption>
+                </figure>
+                <figure>
+                    <img src="assets/rules-3-alur-siklus.svg" alt="Diagram alur satu siklus trading">
+                    <figcaption>Gambar 3 — Alur siklus: gerbang izin entry v4 + stop harian</figcaption>
+                </figure>
+                <figure>
+                    <img src="assets/rules-4-fda-proteksi.svg" alt="Diagram lima syarat FDA dan proteksi modal">
+                    <figcaption>Gambar 4 — 5 syarat zona FDA Grade A+ & proteksi modal v4</figcaption>
+                </figure>
             </div>
         </div>
     </div>
 
     <script>
-        const JUMLAH_SLOT = 2;
-        const TOOLS_AKTIF = ['FDA', 'BASE DBD & RBR', 'SCALP TOOLS'];
+        //--- Helper penyimpanan (multi-akun + tahan data korup)
+        function safeParse(raw, fallback) { try { const v = JSON.parse(raw); return v == null ? fallback : v; } catch (e) { return fallback; } }
+        function normEmail(e) { return String(e || '').trim().toLowerCase(); }
+        function keyCheckout(email) { return 'dataCheckout_' + normEmail(email); }
+        function getCheckout(email) {
+            const per = safeParse(localStorage.getItem(keyCheckout(email)), null);
+            if (per) return per;
+            const lama = safeParse(localStorage.getItem('dataCheckout'), null);
+            if (lama && normEmail(lama.email) === normEmail(email)) return lama;
+            return null;
+        }
 
-        const userAktif = JSON.parse(localStorage.getItem('userLogin'));
+        const JUMLAH_SLOT = 2;
+        const userAktif = safeParse(localStorage.getItem('userLogin'), null);
         if (!userAktif) {
             window.location.href = 'index.html';
         } else {
+            initDashboard();
+        }
+
+        function initDashboard() {
             document.getElementById('welcome-text').innerText =
                 'Halo, ' + userAktif.nama + ' (' + userAktif.email + ')';
+
+            const checkout = getCheckout(userAktif.email);
+            const sudahBeli = !!checkout;
+
+            renderLisensi(checkout);
+            kunciSlotBilaBelumBeli(sudahBeli);
+            renderSemuaSlot();
+        }
+
+        function renderLisensi(checkout) {
+            const box = document.getElementById('license-box');
+            const btn = document.getElementById('btn-checkout');
+            if (!checkout) {
+                box.className = 'license-box belum';
+                box.innerHTML =
+                    '<b>Belum membeli lisensi.</b> Sesuai aturan: Anda wajib melakukan pembelian terlebih dahulu — ' +
+                    'transfer ke <b>BCA 29991062221 a.n. Dede Andi Maulana</b>, lalu upload bukti transfer (JPG) di halaman Checkout. ' +
+                    'Setelah bukti terkirim, barulah 2 slot akun trading dan download EA + panduan terbuka.';
+                btn.innerText = 'Beli Lisensi — Checkout & Upload Bukti Transfer';
+            } else {
+                box.className = 'license-box sudah';
+                const nominal = checkout.nominalTransfer ? ('Rp ' + Number(checkout.nominalTransfer).toLocaleString('id-ID')) : '-';
+                const waktu = checkout.waktuCheckout ? new Date(checkout.waktuCheckout).toLocaleString('id-ID') : '-';
+                box.innerHTML =
+                    '<b>Lisensi AKTIF.</b> Nomor akun lisensi Anda:<br>' +
+                    '<span class="no-lisensi">' + (checkout.noAkun || '-') + '</span><br>' +
+                    'Pembayaran: <strong>' + nominal + '</strong> dari <strong>' + (checkout.namaPengirim || '-') + '</strong> &rarr; ' +
+                    (checkout.rekeningTujuan || 'BCA 29991062221 (Dede Andi Maulana)') + '<br>' +
+                    'Status: <strong>' + (checkout.statusPembayaran || 'Tercatat') + '</strong> &bull; ' + waktu +
+                    (checkout.buktiDataUrl ? '<br><img class="bukti-thumb" src="' + checkout.buktiDataUrl + '" alt="Bukti transfer">' : '');
+                btn.innerText = 'Lihat / Perbarui Bukti Checkout';
+            }
+        }
+
+        function kunciSlotBilaBelumBeli(sudahBeli) {
+            [1, 2].forEach(function(no) {
+                const input = document.getElementById('mt-account-' + no);
+                const btnSimpan = document.getElementById('btn-simpan-' + no);
+                const btnHapus = document.getElementById('btn-hapus-' + no);
+                if (input) input.disabled = !sudahBeli;
+                if (btnSimpan) btnSimpan.disabled = !sudahBeli;
+                if (btnHapus) btnHapus.disabled = !sudahBeli;
+            });
+            if (!sudahBeli) {
+                const desc = document.querySelector('#card-slot p.desc');
+                if (desc) desc.innerText = 'Terkunci: selesaikan pembelian (checkout + bukti transfer) terlebih dahulu untuk mengaktifkan slot akun.';
+            }
         }
 
         function getStorageKeySlot() {
-            const emailKey = (userAktif && userAktif.email) ? userAktif.email : 'default';
+            const emailKey = (userAktif && userAktif.email) ? normEmail(userAktif.email) : 'default';
             return 'mt_slot_akun_' + emailKey;
         }
 
@@ -223,49 +371,43 @@
 
         function sinkronStatusTools(akunAktifList) {
             const infoEl = document.getElementById('tools-access-info');
-            const toolLinks = [
-                document.getElementById('link-file-1'),
-                document.getElementById('link-file-2'),
-                document.getElementById('link-file-3')
-            ];
+            const sudahBeli = !!getCheckout(userAktif.email);
+            const terbuka = sudahBeli && akunAktifList.length > 0;
 
-            const adaAkunAktif = akunAktifList.length > 0;
-
-            if (infoEl) {
-                if (adaAkunAktif) {
-                    infoEl.style.color = '#00c896';
-                    infoEl.innerText =
-                        'Status Tools: AKTIF untuk Akun Trading ' + akunAktifList.join(' & ') +
-                        ' (' + TOOLS_AKTIF.join(', ') + ' terbuka)';
-                } else {
-                    infoEl.style.color = '#fbbf24';
-                    infoEl.innerText =
-                        'Status Tools: Aktifkan minimal 1 nomor akun trading (maks. 2 akun) untuk membuka akses tools.';
-                }
-            }
-
-            toolLinks.forEach((linkEl) => {
-                if (!linkEl) return;
+            const links = document.querySelectorAll('.dl-item');
+            links.forEach(function(linkEl) {
                 if (!linkEl.dataset.originalHref) {
                     linkEl.dataset.originalHref = linkEl.getAttribute('href') || '#';
                 }
-
-                if (adaAkunAktif) {
+                if (terbuka) {
+                    linkEl.classList.remove('dl-locked');
                     linkEl.setAttribute('href', linkEl.dataset.originalHref);
-                    linkEl.style.opacity = '1';
                     linkEl.onclick = null;
                 } else {
-                    linkEl.style.opacity = '0.55';
-                    linkEl.onclick = function (e) {
+                    linkEl.classList.add('dl-locked');
+                    linkEl.onclick = function(e) {
                         e.preventDefault();
-                        const input1 = document.getElementById('mt-account-1');
-                        if (input1) {
-                            input1.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            input1.focus();
+                        const target = !sudahBeli ? document.getElementById('card-lisensi') : document.getElementById('mt-account-1');
+                        if (target) {
+                            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            if (target.focus) target.focus();
                         }
                     };
                 }
             });
+
+            if (infoEl) {
+                if (terbuka) {
+                    infoEl.style.color = '#00c896';
+                    infoEl.innerText = 'Status Tools: AKTIF untuk Akun Trading ' + akunAktifList.join(' & ') + ' — semua file terbuka.';
+                } else if (!sudahBeli) {
+                    infoEl.style.color = '#fbbf24';
+                    infoEl.innerText = 'Status Tools: TERKUNCI — selesaikan pembelian (checkout + bukti transfer) terlebih dahulu.';
+                } else {
+                    infoEl.style.color = '#fbbf24';
+                    infoEl.innerText = 'Status Tools: pembelian tercatat — aktifkan minimal 1 nomor akun trading (maks. 2) untuk membuka download.';
+                }
+            }
         }
 
         function renderSemuaSlot(pesanRingkasan, warnaRingkasan) {
@@ -330,6 +472,7 @@
         }
 
         function simpanSlotAkun(slotIndex) {
+            if (!getCheckout(userAktif.email)) return;   // gerbang pembelian
             const no = slotIndex + 1;
             const inputEl = document.getElementById('mt-account-' + no);
             const infoEl = document.getElementById('info-akun-' + no);
@@ -372,35 +515,10 @@
             renderSemuaSlot('Akun #' + no + ' (' + terhapus + ') dihapus.', '#9ca3af');
         }
 
-        function downloadPanduan() {
-            const slots = ambilSlotAkun();
-            const detailSlot = [0, 1].map((idx) =>
-                'Akun #' + (idx + 1) + ' : ' + (slots[idx] ? slots[idx] + ' (Aktif)' : 'Kosong')
-            ).join('\n');
-
-            const isiPanduan =
-                "PANDUAN INSTALASI - SCAP PRO TOOLS PAC\n" +
-                "=====================================\n" +
-                detailSlot + "\n\n" +
-                "1. Salin file EA ke folder MQL4/Experts atau MQL5/Experts.\n" +
-                "2. Refresh Navigator di MetaTrader lalu tarik EA ke chart.\n" +
-                "3. Aktifkan AutoTrading / Algo Trading di terminal MetaTrader.\n";
-
-            const blob = new Blob([isiPanduan], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'Panduan-Scap-Pro-Tools-PAC.txt';
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
         function logout() {
             localStorage.removeItem('userLogin');
             window.location.href = 'index.html';
         }
-
-        renderSemuaSlot();
     </script>
 </body>
 </html>

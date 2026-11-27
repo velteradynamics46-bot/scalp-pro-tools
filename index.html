@@ -75,19 +75,33 @@
     </div>
 
     <script>
+        //--- Helper penyimpanan (multi-akun + tahan data korup)
+        function safeParse(raw, fallback) { try { const v = JSON.parse(raw); return v == null ? fallback : v; } catch (e) { return fallback; } }
+        function normEmail(e) { return String(e || '').trim().toLowerCase(); }
+        function getAccounts() {
+            const raw = safeParse(localStorage.getItem('akunTerdaftar'), []);
+            if (Array.isArray(raw)) return raw;
+            if (raw && typeof raw === 'object') return [raw];   // migrasi format lama (1 akun)
+            return [];
+        }
+        function findAccount(email) { return getAccounts().find(a => normEmail(a.email) === normEmail(email)) || null; }
+
+        //--- Sudah login? langsung ke dashboard
+        if (safeParse(localStorage.getItem('userLogin'), null)) {
+            window.location.href = 'dashboard.html';
+        }
+
         document.getElementById('login-form').addEventListener('submit', function(e) {
             e.preventDefault();
 
-            const emailInput = document.getElementById('email').value;
+            const emailInput = normEmail(document.getElementById('email').value);
             const passwordInput = document.getElementById('password').value;
             const errorBox = document.getElementById('login-error');
 
-            // Ambil data akun yang pernah didaftarkan
-            const akunTersimpan = JSON.parse(localStorage.getItem('akunTerdaftar'));
+            const akun = findAccount(emailInput);
 
-            if (akunTersimpan && emailInput === akunTersimpan.email && passwordInput === akunTersimpan.password) {
-                // Simpan status sedang login dan arahkan ke Dashboard
-                localStorage.setItem('userLogin', JSON.stringify(akunTersimpan));
+            if (akun && passwordInput === akun.password) {
+                localStorage.setItem('userLogin', JSON.stringify(akun));
                 window.location.href = 'dashboard.html';
             } else {
                 errorBox.style.display = 'block';

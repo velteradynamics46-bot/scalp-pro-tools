@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout Lisensi - Scap pro Tools PAC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body {
+            background-color: #0d0d0d;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #ffffff;
+            padding: 20px;
+        }
+        .checkout-card {
+            background-color: #1a1a1a;
+            width: 100%;
+            max-width: 440px;
+            padding: 36px 28px;
+            border-radius: 12px;
+            border: 1px solid #2a2a2a;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .title-brand { font-size: 22px; font-weight: 700; color: #00bfa5; }
+        .btn-logout {
+            background: transparent;
+            border: 1px solid #3a3a3a;
+            color: #aaaaaa;
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .btn-logout:hover { border-color: #ff5252; color: #ff5252; }
+        .subtitle { font-size: 13px; color: #888888; margin-bottom: 20px; }
+
+        .user-summary {
+            background-color: #141414;
+            border: 1px solid #262626;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 12px;
+            color: #bbbbbb;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .user-summary strong { color: #ffffff; }
+
+        .rek-box {
+            background-color: #121212;
+            border: 1px solid #2e2e2e;
+            border-left: 4px solid #00bfa5;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 18px;
+        }
+        .rek-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #888888; margin-bottom: 4px; }
+        .rek-number { font-size: 18px; font-weight: 700; color: #ffffff; letter-spacing: 0.5px; }
+        .rek-name { font-size: 13px; color: #00bfa5; margin-top: 2px; font-weight: 600; }
+        .btn-copy {
+            margin-top: 10px;
+            background-color: #242424;
+            color: #00bfa5;
+            border: 1px solid #00bfa5;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-copy:hover { background-color: rgba(0, 191, 165, 0.15); }
+
+        .form-group { margin-bottom: 16px; text-align: left; }
+        .form-group label { display: block; font-size: 12px; color: #aaaaaa; margin-bottom: 6px; }
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 11px 14px;
+            font-size: 13px;
+            background-color: #edf2f7;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            color: #333333;
+            outline: none;
+        }
+        .form-group input:focus { border-color: #00bfa5; box-shadow: 0 0 5px rgba(0, 191, 165, 0.3); }
+        .hint { font-size: 11px; color: #888888; margin-top: 5px; }
+
+        .preview-box {
+            display: none;
+            margin-bottom: 16px;
+            text-align: center;
+            background-color: #121212;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #2a2a2a;
+        }
+        .preview-box img {
+            max-width: 100%;
+            max-height: 170px;
+            border-radius: 6px;
+            object-fit: contain;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background-color: #00bfa5;
+            color: #0c0d0d;
+            border: none;
+            padding: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 6px;
+            transition: background-color 0.2s ease;
+        }
+        .btn-submit:hover { background-color: #009688; }
+        .btn-submit:disabled { opacity: 0.7; cursor: default; }
+
+        .alert-error {
+            background-color: rgba(255, 82, 82, 0.15);
+            color: #ff5252;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 15px;
+            display: none;
+            border: 1px solid #ff5252;
+        }
+
+        .success-panel {
+            display: none;
+            margin-top: 18px;
+            background-color: rgba(0, 191, 165, 0.12);
+            border: 1px solid #00bfa5;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+        .success-panel p { font-size: 13px; color: #cccccc; margin-bottom: 6px; }
+        .no-akun-badge {
+            font-size: 20px;
+            font-weight: 700;
+            color: #00bfa5;
+            background: #121212;
+            border: 1px dashed #00bfa5;
+            border-radius: 6px;
+            padding: 10px;
+            margin: 8px 0 12px;
+            letter-spacing: 1px;
+        }
+        .redirect-note { font-size: 12px; color: #999999; margin-bottom: 12px; }
+        .btn-dashboard {
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+            background-color: #00bfa5;
+            color: #0c0d0d;
+            text-decoration: none;
+            padding: 11px;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 6px;
+        }
+        .btn-dashboard:hover { background-color: #009688; }
+        .bukti-tersimpan { max-width: 100%; max-height: 150px; border-radius: 6px; margin: 8px 0; object-fit: contain; }
+        .rule-note { font-size: 12px; color: #9ca3af; line-height: 1.5; margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+
+    <div class="checkout-card">
+        <div class="top-bar">
+            <h1 class="title-brand">Checkout Akun</h1>
+            <button type="button" class="btn-logout" id="btn-logout">Logout</button>
+        </div>
+        <p class="subtitle">Scap pro Tools PAC • Konfirmasi Pembayaran</p>
+
+        <div class="user-summary">
+            <span>Akun: <strong id="user-email">-</strong></span>
+            <span>Nama: <strong id="user-nama">-</strong></span>
+        </div>
+
+        <div class="rek-box">
+            <div class="rek-label">Transfer Bank BCA</div>
+            <div class="rek-number" id="no-bca">29991062221</div>
+            <div class="rek-name">a.n. Dede Andi Maulana</div>
+            <button type="button" class="btn-copy" id="copy-btn">Salin No. Rekening</button>
+        </div>
+
+        <p class="rule-note">
+            Alur lisensi: transfer ke rekening di atas &rarr; upload bukti transfer (JPG) &rarr;
+            setelah bukti terkirim, dashboard membuka <b>2 slot akun trading</b> dan
+            <b>download EA + buku panduan</b>. Bukti tersimpan untuk verifikasi admin.
+        </p>
+
+        <div id="error-box" class="alert-error"></div>
+
+        <form id="checkout-form">
+            <div class="form-group">
+                <label for="nama-pengirim">Nama Pengirim Transfer</label>
+                <input type="text" id="nama-pengirim" placeholder="Masukkan nama sesuai rekening pengirim" required>
+            </div>
+
+            <div class="form-group">
+                <label for="nominal-transfer">Nominal Transfer (Rp)</label>
+                <input type="number" id="nominal-transfer" min="1000" step="1000" placeholder="Contoh: 500000" required>
+                <div class="hint">Isi sesuai nominal yang Anda transfer agar cocok dengan bukti.</div>
+            </div>
+
+            <div class="form-group">
+                <label for="bukti-transfer">Upload Bukti Transfer (Wajib JPG)</label>
+                <input type="file" id="bukti-transfer" accept=".jpg,.jpeg,image/jpeg" required>
+                <div class="hint">Format file harus .jpg atau .jpeg (maksimal 5 MB).</div>
+            </div>
+
+            <div class="preview-box" id="preview-box">
+                <img id="preview-img" src="" alt="Preview Bukti Transfer">
+            </div>
+
+            <button type="submit" id="btn-checkout" class="btn-submit">Selesaikan Checkout & Lanjut ke Dashboard</button>
+        </form>
+
+        <div class="success-panel" id="success-panel">
+            <p id="success-title">Checkout berhasil! Nomor Akun Anda:</p>
+            <div class="no-akun-badge" id="no-akun-hasil">-</div>
+            <img id="bukti-tersimpan" class="bukti-tersimpan" src="" alt="Bukti transfer tersimpan" style="display:none;">
+            <p class="redirect-note" id="redirect-note">Mengalihkan ke Dashboard dalam 3 detik...</p>
+            <a href="dashboard.html" class="btn-dashboard">Buka Dashboard Sekarang &rarr;</a>
+        </div>
+    </div>
+
+    <script>
+        //--- Helper penyimpanan (multi-akun + tahan data korup)
+        function safeParse(raw, fallback) { try { const v = JSON.parse(raw); return v == null ? fallback : v; } catch (e) { return fallback; } }
+        function normEmail(e) { return String(e || '').trim().toLowerCase(); }
+        function getAccounts() {
+            const raw = safeParse(localStorage.getItem('akunTerdaftar'), []);
+            if (Array.isArray(raw)) return raw;
+            if (raw && typeof raw === 'object') return [raw];
+            return [];
+        }
+        function saveAccounts(list) { localStorage.setItem('akunTerdaftar', JSON.stringify(list)); }
+        function upsertAccount(user) {
+            const list = getAccounts();
+            const i = list.findIndex(a => normEmail(a.email) === normEmail(user.email));
+            if (i >= 0) list[i] = Object.assign({}, list[i], user); else list.push(user);
+            saveAccounts(list);
+        }
+        function keyCheckout(email) { return 'dataCheckout_' + normEmail(email); }
+        function getCheckout(email) {
+            const per = safeParse(localStorage.getItem(keyCheckout(email)), null);
+            if (per) return per;
+            const lama = safeParse(localStorage.getItem('dataCheckout'), null);   // migrasi format lama
+            if (lama && normEmail(lama.email) === normEmail(email)) return lama;
+            return null;
+        }
+
+        const userLogin = safeParse(localStorage.getItem('userLogin'), null);
+        if (!userLogin) {
+            window.location.href = 'index.html';
+        } else {
+            document.getElementById('user-email').innerText = userLogin.email || '-';
+            document.getElementById('user-nama').innerText = userLogin.nama || userLogin.name || 'Member';
+        }
+
+        const noBca = document.getElementById('no-bca').innerText.trim();
+        const copyBtn = document.getElementById('copy-btn');
+        const fileInput = document.getElementById('bukti-transfer');
+        const previewBox = document.getElementById('preview-box');
+        const previewImg = document.getElementById('preview-img');
+        const errorBox = document.getElementById('error-box');
+        const checkoutForm = document.getElementById('checkout-form');
+        const btnCheckout = document.getElementById('btn-checkout');
+        const successPanel = document.getElementById('success-panel');
+        const noAkunHasil = document.getElementById('no-akun-hasil');
+        const redirectNote = document.getElementById('redirect-note');
+        const buktiTersimpan = document.getElementById('bukti-tersimpan');
+
+        //--- Salin rekening (dengan fallback bila clipboard API tidak tersedia)
+        copyBtn.addEventListener('click', function() {
+            function selesai() {
+                copyBtn.innerText = 'Tersalin!';
+                setTimeout(() => { copyBtn.innerText = 'Salin No. Rekening'; }, 2000);
+            }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(noBca).then(selesai).catch(() => fallbackSalin());
+            } else {
+                fallbackSalin();
+            }
+            function fallbackSalin() {
+                const ta = document.createElement('textarea');
+                ta.value = noBca;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                try { document.execCommand('copy'); selesai(); } catch (e) { window.prompt('Salin manual no. rekening:', noBca); }
+                document.body.removeChild(ta);
+            }
+        });
+
+        function isValidJpg(file) {
+            if (!file) return false;
+            const name = file.name.toLowerCase();
+            return (name.endsWith('.jpg') || name.endsWith('.jpeg')) && file.type === 'image/jpeg';
+        }
+
+        function showError(msg) {
+            errorBox.style.display = 'block';
+            errorBox.innerText = msg;
+        }
+
+        function hideError() {
+            errorBox.style.display = 'none';
+            errorBox.innerText = '';
+        }
+
+        fileInput.addEventListener('change', function() {
+            hideError();
+            const file = fileInput.files[0];
+            if (!file) {
+                previewBox.style.display = 'none';
+                return;
+            }
+            if (!isValidJpg(file)) {
+                previewBox.style.display = 'none';
+                fileInput.value = '';
+                showError('Bukti transfer harus berformat JPG (.jpg atau .jpeg)!');
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                previewBox.style.display = 'none';
+                fileInput.value = '';
+                showError('Ukuran file bukti transfer maksimal 5 MB.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                previewBox.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        //--- Kompresi bukti agar muat di localStorage (maks sisi 1000px, JPEG 0.75)
+        function kompresBukti(dataUrl) {
+            return new Promise(function(resolve) {
+                const img = new Image();
+                img.onload = function() {
+                    const maks = 1000;
+                    const skala = Math.min(1, maks / Math.max(img.width, img.height));
+                    const canvas = document.createElement('canvas');
+                    canvas.width = Math.max(1, Math.round(img.width * skala));
+                    canvas.height = Math.max(1, Math.round(img.height * skala));
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    resolve(canvas.toDataURL('image/jpeg', 0.75));
+                };
+                img.onerror = function() { resolve(dataUrl); };
+                img.src = dataUrl;
+            });
+        }
+
+        //--- Sudah pernah checkout? tampilkan ringkasan, jangan bayar dobel
+        const checkoutLama = userLogin ? getCheckout(userLogin.email) : null;
+        if (checkoutLama) {
+            checkoutForm.style.display = 'none';
+            successPanel.style.display = 'block';
+            document.getElementById('success-title').innerText = 'Anda sudah checkout. Nomor Akun Anda:';
+            noAkunHasil.innerText = checkoutLama.noAkun || (userLogin.noAkun || '-');
+            redirectNote.innerText = 'Bukti transfer sudah tercatat. Silakan lanjut ke dashboard untuk isi slot akun & download.';
+            if (checkoutLama.buktiDataUrl) {
+                buktiTersimpan.src = checkoutLama.buktiDataUrl;
+                buktiTersimpan.style.display = 'inline-block';
+            }
+        }
+
+        checkoutForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            hideError();
+
+            const namaPengirim = document.getElementById('nama-pengirim').value.trim();
+            const nominal = Number(document.getElementById('nominal-transfer').value);
+            const file = fileInput.files[0];
+
+            if (!namaPengirim) {
+                showError('Silakan masukkan nama pengirim transfer.');
+                return;
+            }
+            if (!nominal || nominal < 1000) {
+                showError('Nominal transfer wajib diisi (minimal Rp 1.000).');
+                return;
+            }
+            if (!isValidJpg(file)) {
+                showError('Silakan upload file bukti transfer berupa JPG.');
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                showError('Ukuran file bukti transfer maksimal 5 MB.');
+                return;
+            }
+
+            btnCheckout.disabled = true;
+            btnCheckout.innerText = 'Memproses bukti...';
+
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                kompresBukti(ev.target.result).then(function(buktiKecil) {
+                    const noAkun = userLogin.noAkun || ('PAC-' + Math.floor(100000 + Math.random() * 900000));
+                    const dataCheckout = {
+                        noAkun: noAkun,
+                        email: normEmail(userLogin.email),
+                        namaPengirim: namaPengirim,
+                        nominalTransfer: nominal,
+                        rekeningTujuan: 'BCA 29991062221 (Dede Andi Maulana)',
+                        namaFileBukti: file.name,
+                        buktiDataUrl: buktiKecil,
+                        statusPembayaran: 'Tercatat - menunggu verifikasi admin',
+                        waktuCheckout: new Date().toISOString()
+                    };
+
+                    const updatedUser = Object.assign({}, userLogin, {
+                        noAkun: noAkun,
+                        statusLisensi: 'Aktif'
+                    });
+
+                    try {
+                        localStorage.setItem(keyCheckout(userLogin.email), JSON.stringify(dataCheckout));
+                    } catch (err) {
+                        showError('Penyimpanan browser penuh. Hapus data situs lain lalu coba lagi.');
+                        btnCheckout.disabled = false;
+                        btnCheckout.innerText = 'Selesaikan Checkout & Lanjut ke Dashboard';
+                        return;
+                    }
+                    localStorage.setItem('userLogin', JSON.stringify(updatedUser));
+                    upsertAccount(updatedUser);
+
+                    noAkunHasil.innerText = noAkun;
+                    buktiTersimpan.src = buktiKecil;
+                    buktiTersimpan.style.display = 'inline-block';
+                    checkoutForm.style.display = 'none';
+                    successPanel.style.display = 'block';
+                    btnCheckout.innerText = 'Checkout Selesai';
+
+                    let sisaDetik = 3;
+                    const interval = setInterval(() => {
+                        sisaDetik--;
+                        if (sisaDetik > 0) {
+                            redirectNote.innerText = 'Mengalihkan ke Dashboard dalam ' + sisaDetik + ' detik...';
+                        } else {
+                            clearInterval(interval);
+                            window.location.href = 'dashboard.html';
+                        }
+                    }, 1000);
+                });
+            };
+            reader.readAsDataURL(file);
+        });
+
+        document.getElementById('btn-logout').addEventListener('click', function() {
+            localStorage.removeItem('userLogin');
+            window.location.href = 'index.html';
+        });
+    </script>
+
+</body>
+</html>

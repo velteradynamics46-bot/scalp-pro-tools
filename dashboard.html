@@ -171,11 +171,17 @@
         .visual-grid figcaption {
             font-size: 12px; color: #9ca3af; margin-top: 8px; text-align: center; line-height: 1.4;
         }
+        .promo-banner {
+            width: 100%; border-radius: 12px; border: 1px solid #2a2a2a; display: block; margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <!-- Banner promo (klik = checkout) -->
+        <a href="Checkout.html" title="Lihat promo & checkout"><img class="promo-banner" src="assets/promo-banner.png" alt="Promo EA SCALP TOOLS v4.01 - diskon 30% sampai 30 November 2026"></a>
+
         <!-- Header -->
         <div class="header">
             <div>
@@ -355,8 +361,9 @@
                 const nominal = checkout.nominalTransfer ? ('Rp ' + Number(checkout.nominalTransfer).toLocaleString('id-ID')) : '-';
                 const waktu = checkout.waktuCheckout ? new Date(checkout.waktuCheckout).toLocaleString('id-ID') : '-';
                 box.innerHTML =
-                    '<b>Lisensi AKTIF.</b> Nomor akun lisensi Anda:<br>' +
-                    '<span class="no-lisensi">' + (checkout.noAkun || '-') + '</span><br>' +
+                    '<b>Lisensi AKTIF.</b> Informasi IB HFM:<br>' +
+                    '<span class="no-lisensi">IB HFM : 30532777</span><br>' +
+                    'Harga lisensi: <strong>Rp 3.000.000</strong> &bull; promo 30%: <strong>Rp 2.100.000</strong> (s.d. 30 Nov 2026)<br>' +
                     'Pembayaran: <strong>' + nominal + '</strong> dari <strong>' + (checkout.namaPengirim || '-') + '</strong> &rarr; ' +
                     (checkout.rekeningTujuan || 'BCA 29991062221 (Dede Andi Maulana)') + '<br>' +
                     'Status: <strong>' + (checkout.statusPembayaran || 'Tercatat') + '</strong> &bull; ' + waktu +

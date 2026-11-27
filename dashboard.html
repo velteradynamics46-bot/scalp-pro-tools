@@ -132,6 +132,31 @@
         .dl-item.utama:hover { background-color: #009688; }
         .dl-locked { opacity: 0.5; }
 
+        .rek-box {
+            background-color: #121212;
+            border: 1px solid #2e2e2e;
+            border-left: 4px solid #00bfa5;
+            border-radius: 8px;
+            padding: 14px;
+            margin-top: 16px;
+        }
+        .rek-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #888888; margin-bottom: 4px; }
+        .rek-number { font-size: 15px; font-weight: 700; color: #ffffff; letter-spacing: 0.3px; word-break: break-all; }
+        .rek-name { font-size: 13px; color: #00bfa5; margin-top: 2px; font-weight: 600; }
+        .btn-copy {
+            margin-top: 10px;
+            background-color: #242424;
+            color: #00bfa5;
+            border: 1px solid #00bfa5;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-copy:hover { background-color: rgba(0, 191, 165, 0.15); }
+
         .visual-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 14px;
@@ -223,6 +248,19 @@
             </div>
 
             <p class="status-text" id="mt-status-text">Akun aktif untuk trading: Belum ada (0 / 2 akun aktif).</p>
+
+            <!-- URL feed news untuk MT5 (copy-paste ke WebRequest) -->
+            <div class="rek-box">
+                <div class="rek-label">URL Feed News MT5 (WebRequest)</div>
+                <div class="rek-number" id="url-feed">https://nfs.faireconomy.media/</div>
+                <div class="rek-name">Wajib didaftarkan agar filter news otomatis aktif</div>
+                <button type="button" class="btn-copy" id="copy-url-btn">Salin URL</button>
+                <p class="slot-note">
+                    Cara pasang di MT5: <b>Tools &rarr; Options &rarr; Expert Advisors</b> &rarr; centang
+                    <b>"Allow WebRequest for listed URL"</b> &rarr; klik <b>Add</b> &rarr; tempel URL ini &rarr; OK
+                    &rarr; pasang ulang EA. Berlaku per terminal (ulangi di tiap MT5 yang dipakai).
+                </p>
+            </div>
         </div>
 
         <!-- Kartu File & Panduan -->
@@ -518,6 +556,35 @@
             localStorage.removeItem('userLogin');
             window.location.href = 'index.html';
         }
+
+        //--- Salin URL feed news (dengan fallback bila clipboard API tidak tersedia)
+        (function() {
+            const urlEl = document.getElementById('url-feed');
+            const btn = document.getElementById('copy-url-btn');
+            if (!urlEl || !btn) return;
+            const url = urlEl.innerText.trim();
+            btn.addEventListener('click', function() {
+                function selesai() {
+                    btn.innerText = 'Tersalin!';
+                    setTimeout(() => { btn.innerText = 'Salin URL'; }, 2000);
+                }
+                function fallbackSalin() {
+                    const ta = document.createElement('textarea');
+                    ta.value = url;
+                    ta.style.position = 'fixed';
+                    ta.style.opacity = '0';
+                    document.body.appendChild(ta);
+                    ta.select();
+                    try { document.execCommand('copy'); selesai(); } catch (e) { window.prompt('Salin manual URL feed:', url); }
+                    document.body.removeChild(ta);
+                }
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(url).then(selesai).catch(fallbackSalin);
+                } else {
+                    fallbackSalin();
+                }
+            });
+        })();
     </script>
 </body>
 </html>
